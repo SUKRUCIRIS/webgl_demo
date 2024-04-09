@@ -59,7 +59,6 @@ ${MY_SOURCES}
 ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opengl/src/glad.c
 )
 
-set_target_properties(webgl_demo PROPERTIES LINK_FLAGS "-s USE_WEBGL2=1 -s USE_GLFW=3 -s USE_FREETYPE=1 -s USE_ZLIB=1
--s ALLOW_MEMORY_GROWTH=1 -s BINARYEN_ASYNC_COMPILATION=1 -s WASM=1")
+set_target_properties(webgl_demo PROPERTIES LINK_FLAGS "-s USE_WEBGL2=1 -s USE_GLFW=3 -s USE_FREETYPE=1 -s USE_ZLIB=1 -s ALLOW_MEMORY_GROWTH=1 -s BINARYEN_ASYNC_COMPILATION=1 -s WASM=1")
 
 target_link_libraries(webgl_demo cglm assimp)
