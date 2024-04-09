@@ -5,8 +5,11 @@ emscripten, cmake, make
 ## How to compile project:
 
 ```
-mkdir build
-cd build
-emcmake cmake ..
-emmake make
+build.bat
+```
+
+## How to run project:
+
+```
+run.bat
 ```

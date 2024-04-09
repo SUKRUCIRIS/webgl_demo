@@ -39,13 +39,13 @@ add_subdirectory(third_party/assimp)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/cglm/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/glfw/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/opengl/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/opengl)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/assimp/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/build/third_party/assimp/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/freetype)
 
-FILE(GLOB_RECURSE MY_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
+FILE(GLOB_RECURSE MY_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/**")
 
 cmake_print_variables(MY_SOURCES)
 
@@ -56,9 +56,8 @@ set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 add_executable(
 webgl_demo
 ${MY_SOURCES}
-${CMAKE_CURRENT_SOURCE_DIR}/third_party/opengl/src/glad.c
 )
 
-set_target_properties(webgl_demo PROPERTIES LINK_FLAGS "-s USE_WEBGL2=1 -s USE_GLFW=3 -s USE_FREETYPE=1 -s USE_ZLIB=1 -s ALLOW_MEMORY_GROWTH=1 -s BINARYEN_ASYNC_COMPILATION=1 -s WASM=1")
+set_target_properties(webgl_demo PROPERTIES LINK_FLAGS "-s FULL_ES3=1 -s USE_GLFW=3 -s USE_FREETYPE=1 -s USE_ZLIB=1 -s ALLOW_MEMORY_GROWTH=1 -s BINARYEN_ASYNC_COMPILATION=1 -s WASM=1 --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/template.html")
 
 target_link_libraries(webgl_demo cglm assimp)

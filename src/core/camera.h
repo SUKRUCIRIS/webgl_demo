@@ -1,6 +1,6 @@
 #pragma once
 #include "../../third_party/cglm/include/cglm/cglm.h"
-#include "../../third_party/opengl/include/glad/glad.h"
+#include "../../third_party/opengl/gl32.h"
 #include "../../third_party/glfw/glfw3.h"
 #include "dynamic.h"
 

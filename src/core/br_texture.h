@@ -1,5 +1,5 @@
 #pragma once
-#include "../../third_party/opengl/include/glad/glad.h"
+#include "../../third_party/opengl/gl32.h"
 #include "dynamic.h"
 
 typedef struct br_texture_manager

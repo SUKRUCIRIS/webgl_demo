@@ -104,7 +104,6 @@ GLFWwindow *create_window(int width, int height, unsigned char is_full, unsigned
 	{
 		glfwSwapInterval(0);
 	}
-	gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
 	glViewport(0, 0, width, height);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
