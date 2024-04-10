@@ -58,6 +58,6 @@ webgl_demo
 ${MY_SOURCES}
 )
 
-set_target_properties(webgl_demo PROPERTIES LINK_FLAGS "-s FULL_ES3=1 -s USE_GLFW=3 -s USE_FREETYPE=1 -s USE_ZLIB=1 -s ALLOW_MEMORY_GROWTH=1 -s BINARYEN_ASYNC_COMPILATION=1 -s WASM=1 --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/template.html")
+set_target_properties(webgl_demo PROPERTIES LINK_FLAGS "-s USE_GLFW=3 -s USE_FREETYPE=1 -s USE_ZLIB=1 -s ALLOW_MEMORY_GROWTH=1 -s BINARYEN_ASYNC_COMPILATION=1 -s MAX_WEBGL_VERSION=2 -s MIN_WEBGL_VERSION=2 -s WASM=1 --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/template.html --embed-file ${CMAKE_CURRENT_SOURCE_DIR}/assets/@/")
 
 target_link_libraries(webgl_demo cglm assimp)
