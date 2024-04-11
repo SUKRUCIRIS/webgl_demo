@@ -38,11 +38,16 @@ int main()
   ld.texmanager = new texture_manager();
   ld.objmanager->create_cube_object();
   ld.objmanager->prepare_render();
+  ld.sb = new skybox("./textures/skybox/px.png", "./textures/skybox/nx.png",
+                     "./textures/skybox/py.png", "./textures/skybox/ny.png",
+                     "./textures/skybox/pz.png", "./textures/skybox/nz.png",
+                     object_manager::get_default_camera());
 
   prepareloop(&ld);
 
   emscripten_set_main_loop(mainloop, 0, 1);
 
+  delete ld.sb;
   delete ld.texmanager;
   delete ld.objmanager;
   delete ld.trenderer;

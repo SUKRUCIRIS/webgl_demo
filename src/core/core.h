@@ -6,3 +6,4 @@
 #include "camera.h"
 #include "mesh.h"
 #include "texture.h"
+#include "skybox.h"

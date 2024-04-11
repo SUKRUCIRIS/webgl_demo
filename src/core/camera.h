@@ -21,13 +21,13 @@ protected:
   float lastmousey = -1;
   int width;
   int height;
-  mat4 view;
-  mat4 projection;
   std::vector<GLuint> programs; // i will save uniforms here. i wont find their locations everytime i render for performance
   std::vector<GLint> uniforms;
   virtual void calculate_projection() = 0;
 
 public:
+  mat4 view;
+  mat4 projection;
   void run_input_rotate_camera3D(GLFWwindow *window);
   void run_input_free_camera3D(GLFWwindow *window);
   void calculate();

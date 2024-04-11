@@ -31,8 +31,6 @@ private:
   std::vector<GLint> uniforms;
   size_t object_number;
   size_t indice_number;
-  const static std::string default_vertex_shader;
-  const static std::string default_fragment_shader;
   static shader_program *default_program;
   static camera *default_cam;
   void object_apply_model_matrix(object *obj);

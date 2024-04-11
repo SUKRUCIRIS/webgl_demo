@@ -17,6 +17,7 @@ void mainloop(void)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   loda->texmanager->use(*object_manager::get_default_program());
   loda->objmanager->render();
+  loda->sb->render();
   loda->trenderer->render();
   object_manager::get_default_camera()->run_input_free_camera3D(loda->window);
   glfwPollEvents();
