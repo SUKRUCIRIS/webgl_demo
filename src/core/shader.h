@@ -10,8 +10,8 @@ private:
   GLuint program = 0;
 
 public:
-  shader_program(const std::string &vertex_source, const std::string &fragment_source);
+  shader_program(std::string vertex_source, std::string fragment_source, bool file);
   ~shader_program();
-  void use();
-  GLuint get();
+  void use() const;
+  GLuint get() const;
 };

@@ -4,8 +4,9 @@
 typedef struct loopdata
 {
   GLFWwindow *window = 0;
-  text_renderer *trenderer = 0;
+  ui_text_renderer *trenderer = 0;
   int scwidth = 0, scheight = 0;
+  object_manager *objmanager = 0;
 } loopdata;
 
 void mainloop(void);

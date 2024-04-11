@@ -1,5 +1,4 @@
 #include "app.h"
-#include <emscripten.h>
 // Şükrü Çiriş 2024
 loopdata *loda;
 
@@ -15,6 +14,7 @@ void mainloop(void)
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glViewport(0, 0, loda->scwidth, loda->scheight);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  loda->objmanager->render();
   loda->trenderer->render();
   glfwPollEvents();
   glfwSwapBuffers(loda->window);

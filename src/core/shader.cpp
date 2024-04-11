@@ -1,8 +1,20 @@
 #include "shader.h"
+#include <fstream>
+#include <streambuf>
 // Şükrü Çiriş 2024
 
-shader_program::shader_program(const std::string &vertex_source, const std::string &fragment_source)
+shader_program::shader_program(std::string vertex_source, std::string fragment_source, bool file)
 {
+  if (file)
+  {
+    std::ifstream t(vertex_source);
+    vertex_source = std::string((std::istreambuf_iterator<char>(t)),
+                                std::istreambuf_iterator<char>());
+
+    t = std::ifstream(fragment_source);
+    fragment_source = std::string((std::istreambuf_iterator<char>(t)),
+                                  std::istreambuf_iterator<char>());
+  }
   GLint gl_shader_result = GL_FALSE;
   int InfoLogLength;
 
@@ -47,7 +59,7 @@ shader_program::shader_program(const std::string &vertex_source, const std::stri
   // Check the program
   glGetProgramiv(this->program, GL_LINK_STATUS, &gl_shader_result);
   glGetProgramiv(this->program, GL_INFO_LOG_LENGTH, &InfoLogLength);
-  if (InfoLogLength > 0)
+  if (InfoLogLength > 1)
   {
     std::string msg(InfoLogLength + 1, '\0');
     glGetProgramInfoLog(this->program, InfoLogLength, NULL, (GLchar *)msg.c_str());
@@ -64,11 +76,11 @@ shader_program::~shader_program()
 {
   glDeleteProgram(this->program);
 }
-void shader_program::use()
+void shader_program::use() const
 {
   glUseProgram(this->program);
 }
-GLuint shader_program::get()
+GLuint shader_program::get() const
 {
   return this->program;
 }

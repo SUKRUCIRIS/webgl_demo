@@ -2,43 +2,22 @@
 #include <algorithm>
 // Şükrü Çiriş 2024
 
-std::string vertex_shader = {
-    "#version 300 es\n"
-    "layout(location = 0) in vec3 pos;\n"
-    "layout(location = 1) in vec2 tex;\n"
-    "layout(location = 2) in vec4 rgba;\n"
-    "out vec2 TexCoords;\n"
-    "out vec4 RGBA;\n"
-    "uniform mat4 projection;\n"
-    "void main()\n"
-    "{\n"
-    "  TexCoords = tex;\n"
-    "  RGBA = rgba;\n"
-    "  gl_Position = projection * vec4(pos, 1.0);\n"
-    "}\n"};
+shader_program *ui_text_renderer::default_program = 0;
 
-std::string fragment_shader = {
-    "#version 300 es\n"
-    "precision mediump float;\n"
-    "in vec2 TexCoords;\n"
-    "in vec4 RGBA;\n"
-    "out vec4 FragColor;\n"
-    "uniform sampler2D font_textures;\n"
-    "void main(){\n"
-    "  FragColor = vec4(RGBA.rgb,texture(font_textures, TexCoords).r*RGBA.a);\n"
-    "}\n"};
+camera *ui_text_renderer::default_cam = 0;
 
-shader_program *default_text_shader = 0;
-
-text_renderer::text_renderer(const std::string &font_file, int height, int screenwidth, int screenheight,
-                             int realsw, int realsh, GLint min_filter, GLint mag_filter)
+ui_text_renderer::ui_text_renderer(const std::string &font_file, int height, int virtualsw, int virtualsh,
+                                   int realsw, int realsh, GLint min_filter, GLint mag_filter)
 {
-
-  if (default_text_shader == 0)
+  if (ui_text_renderer::default_program == 0)
   {
-    default_text_shader = new shader_program(vertex_shader, fragment_shader);
+    default_program = new shader_program("./shaders/font.vs", "./shaders/font.fs", true);
   }
-
+  if (ui_text_renderer::default_cam == 0)
+  {
+    vec3 pos = {0, 0, 0};
+    default_cam = new camera_orthogonal(realsw, realsh, 0.0f, (float)virtualsw, 0.0f, (float)virtualsh, pos, -100.0f, 100.0f);
+  }
   FT_Library ft;
   if (FT_Init_FreeType(&ft))
   {
@@ -110,24 +89,23 @@ text_renderer::text_renderer(const std::string &font_file, int height, int scree
 
   FT_Done_Face(face);
   FT_Done_FreeType(ft);
-  this->screenwidth = screenwidth;
-  this->screenheight = screenheight;
+  this->virtualsw = virtualsw;
+  this->virtualsh = virtualsh;
   this->realsw = realsw;
   this->realsh = realsh;
-  glm_ortho(0.0f, (float)screenwidth, 0.0f, (float)screenheight, -100.0f, 100.0f, this->projection);
   this->VAO = 0;
   this->VBO = 0;
   this->EBO = 0;
   this->newdata = 0;
 }
-text_renderer::~text_renderer()
+ui_text_renderer::~ui_text_renderer()
 {
   glDeleteTextures(1, &(this->font_textures));
   glDeleteVertexArrays(1, &(this->VAO));
   glDeleteBuffers(1, &(this->VBO));
   glDeleteBuffers(1, &(this->EBO));
 }
-void text_renderer::add_text(float startx, float starty, float z, float scale, vec4 rgba, const std::string &text)
+void ui_text_renderer::add_text(float startx, float starty, float z, float scale, vec4 rgba, const std::string &text)
 {
   this->newdata = 1;
   GLuint *indices = (GLuint *)malloc(sizeof(GLuint) * 6 * text.size());
@@ -173,7 +151,7 @@ void text_renderer::add_text(float startx, float starty, float z, float scale, v
   this->indices.insert(this->indices.end(), indices, indices + 6 * text.size());
   free(indices);
 }
-void text_renderer::get_text_size(int scale, float *width, float *height, const std::string &text)
+void ui_text_renderer::get_text_size(int scale, float *width, float *height, const std::string &text)
 {
   *width = 0;
   *height = 0;
@@ -203,13 +181,8 @@ void text_renderer::get_text_size(int scale, float *width, float *height, const 
     *height = std::max(*height, ypos + h);
   }
 }
-void text_renderer::render(shader_program *program)
+void ui_text_renderer::render(const shader_program &program, camera &cam)
 {
-  if (program == 0)
-  {
-    program = default_text_shader;
-  }
-  program->use();
   if ((this->VAO == 0 || this->newdata == 1) && this->indices.size() > 0)
   {
     this->newdata = 0;
@@ -237,29 +210,29 @@ void text_renderer::render(shader_program *program)
   }
   if (this->VAO != 0)
   {
+    program.use();
+    cam.calculate();
+    cam.use(program);
     glActiveTexture(GL_TEXTURE31);
     glBindTexture(GL_TEXTURE_2D, this->font_textures);
-    auto it = std::find(this->programs.begin(), this->programs.end(), program->get());
+    auto it = std::find(this->programs.begin(), this->programs.end(), program.get());
     if (it == this->programs.end())
     {
-      this->programs.push_back(program->get());
-      GLint uniform = glGetUniformLocation(program->get(), "projection");
-      this->uniforms.push_back(uniform);
-      uniform = glGetUniformLocation(program->get(), "font_textures");
+      this->programs.push_back(program.get());
+      GLint uniform = glGetUniformLocation(program.get(), "font_textures");
       this->uniforms.push_back(uniform);
     }
-    it = std::find(this->programs.begin(), this->programs.end(), program->get());
+    it = std::find(this->programs.begin(), this->programs.end(), program.get());
     int index = std::distance(this->programs.begin(), it);
     GLint *uniforms = this->uniforms.data();
-    glUniformMatrix4fv(uniforms[index * 2], 1, GL_FALSE, this->projection[0]);
-    glUniform1i(uniforms[index * 2 + 1], 31);
+    glUniform1i(uniforms[index], 31);
 
     glBindVertexArray(this->VAO);
     glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
   }
 }
-void text_renderer::clear()
+void ui_text_renderer::clear()
 {
   glDeleteVertexArrays(1, &(this->VAO));
   glDeleteBuffers(1, &(this->VBO));

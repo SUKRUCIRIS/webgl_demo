@@ -33,7 +33,10 @@ int main()
   ld.window = window;
   ld.scheight = height;
   ld.scwidth = width;
-  ld.trenderer = new text_renderer("./fonts/arial.ttf", 128, 1920, 1080, width, height, GL_LINEAR, GL_LINEAR);
+  ld.trenderer = new ui_text_renderer("./fonts/arial.ttf", 128, 1920, 1080, width, height, GL_LINEAR, GL_LINEAR);
+  ld.objmanager = new object_manager(width, height);
+  ld.objmanager->create_cube_object();
+  ld.objmanager->prepare_render();
 
   prepareloop(&ld);
 
