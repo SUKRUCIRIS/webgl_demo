@@ -13,8 +13,7 @@ object_manager::object_manager(int realsw, int realsh)
   if (object_manager::default_cam == 0)
   {
     vec3 pos = {0, 0, 2};
-    vec3 axis = {0, 1, 0};
-    object_manager::default_cam = new camera_perspective(realsw, realsh, pos, 60, 0.1f, 1000, 1, 100, -90, axis);
+    object_manager::default_cam = new camera_perspective(realsw, realsh, pos, 60, 0.1f, 1000, 0.1f, 100);
   }
   this->VAO = 0;
   this->VBO = 0;
@@ -62,7 +61,7 @@ float *object_manager::get_position()
 {
   return this->translation[3];
 }
-size_t object_manager::create_object(GLfloat *vertices, size_t vertex_number, GLuint *indices, size_t indice_number, GLfloat texture_index)
+object_manager::object *object_manager::create_object(GLfloat *vertices, size_t vertex_number, GLuint *indices, size_t indice_number, GLfloat texture_index)
 {
   if (vertices == 0 || vertex_number == 0)
   {
@@ -109,29 +108,31 @@ size_t object_manager::create_object(GLfloat *vertices, size_t vertex_number, GL
   this->objects.push_back(x);
   this->indice_number = this->indices.size();
   this->object_number = this->objects.size();
-  return this->objects.size() - 1;
+  return x;
 }
-void object_manager::scale_object(size_t index, vec3 v)
+void object_manager::scale_object(object *id, vec3 v)
 {
-  glm_scale(this->objects[index]->model, v);
-  object_apply_model_matrix(this->objects[index]);
+  glm_scale(id->model, v);
+  object_apply_model_matrix(id);
 }
-void object_manager::rotate_object(size_t index, float angle, vec3 axis)
+void object_manager::rotate_object(object *id, float angle, vec3 axis)
 {
-  glm_rotate(this->objects[index]->model, glm_rad(angle), axis);
-  object_apply_model_matrix(this->objects[index]);
+  glm_rotate(id->model, glm_rad(angle), axis);
+  object_apply_model_matrix(id);
 }
-void object_manager::translate_object(size_t index, vec3 v)
+void object_manager::translate_object(object *id, vec3 v)
 {
-  glm_translate(this->objects[index]->model, v);
-  object_apply_model_matrix(this->objects[index]);
+  glm_translate(id->model, v);
+  object_apply_model_matrix(id);
 }
-void object_manager::delete_object(size_t index)
+void object_manager::delete_object(object *id)
 {
-  if (index >= this->objects.size())
+  auto it = std::find(this->objects.begin(), this->objects.end(), id);
+  if (it == this->objects.end())
   {
     return;
   }
+  size_t index = std::distance(this->objects.begin(), it);
   object *obj = this->objects[index];
   this->vertices.erase(this->vertices.begin() + obj->vertex_start * 9, this->vertices.begin() + obj->vertex_start * 9 + obj->vertex_number * 9);
   this->indices.erase(this->indices.begin() + obj->indice_start, this->indices.begin() + obj->indice_start + obj->indice_number);
@@ -170,13 +171,12 @@ void object_manager::render(const shader_program &program, camera &cam)
     }
     it = std::find(this->programs.begin(), this->programs.end(), program.get());
     int index = std::distance(this->programs.begin(), it);
-    GLint *uniforms = this->uniforms.data();
     mat4 *tmp[] = {&this->translation, &this->rotation, &this->scaling};
     glm_mat4_mulN(tmp, 3, this->model);
     glm_mat4_inv(this->model, this->normal);
     glm_mat4_transpose(this->normal);
-    glUniformMatrix4fv(uniforms[index * 2], 1, GL_FALSE, this->model[0]);
-    glUniformMatrix4fv(uniforms[index * 2 + 1], 1, GL_FALSE, this->normal[0]);
+    glUniformMatrix4fv(this->uniforms[index * 2], 1, GL_FALSE, this->model[0]);
+    glUniformMatrix4fv(this->uniforms[index * 2 + 1], 1, GL_FALSE, this->normal[0]);
 
     if (this->subdata)
     {
@@ -243,7 +243,11 @@ camera *object_manager::get_default_camera()
 {
   return object_manager::default_cam;
 }
-size_t object_manager::create_cube_object(float texture_index, vec3 pos, vec3 scaling)
+shader_program *object_manager::get_default_program()
+{
+  return object_manager::default_program;
+}
+object_manager::object *object_manager::create_cube_object(float texture_index, vec3 pos, vec3 scaling)
 {
   static GLfloat cube_vertices[] = {
       -0.5f, -0.5f, -0.5f, 0, 0, 0, 0, -1, 0, // A 0
@@ -291,15 +295,15 @@ size_t object_manager::create_cube_object(float texture_index, vec3 pos, vec3 sc
       22, 21, 20,
       20, 23, 22};
 
-  size_t index = this->create_object(cube_vertices, 24, cube_indices, 36, texture_index);
+  object *id = this->create_object(cube_vertices, 24, cube_indices, 36, texture_index);
   if (pos != 0)
   {
-    this->translate_object(index, pos);
+    this->translate_object(id, pos);
   }
   if (scaling != 0)
   {
-    this->scale_object(index, scaling);
+    this->scale_object(id, scaling);
   }
 
-  return index;
+  return id;
 }

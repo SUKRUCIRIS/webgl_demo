@@ -224,8 +224,7 @@ void ui_text_renderer::render(const shader_program &program, camera &cam)
     }
     it = std::find(this->programs.begin(), this->programs.end(), program.get());
     int index = std::distance(this->programs.begin(), it);
-    GLint *uniforms = this->uniforms.data();
-    glUniform1i(uniforms[index], 31);
+    glUniform1i(this->uniforms[index], 31);
 
     glBindVertexArray(this->VAO);
     glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);

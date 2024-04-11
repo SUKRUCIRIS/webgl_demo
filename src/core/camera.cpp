@@ -10,7 +10,6 @@ camera_perspective::camera_perspective(int screenwidth, int screenheight, vec3 p
   this->up[0] = 0;
   this->up[1] = 1;
   this->up[2] = 0;
-  this->firstclick = 1;
   this->speed = speed;
   this->sensitivity = sensitivity;
   this->width = screenwidth;
@@ -21,6 +20,7 @@ camera_perspective::camera_perspective(int screenwidth, int screenheight, vec3 p
   this->FOVdeg = FOVdeg;
   this->nearPlane = nearPlane;
   this->farPlane = farPlane;
+  this->basespeed = speed;
   if (angle != 0)
   {
     glm_vec3_rotate(this->orientation, glm_rad(angle), angle_axis);
@@ -31,32 +31,32 @@ camera_perspective::camera_perspective(int screenwidth, int screenheight, vec3 p
 }
 void camera::run_input_rotate_camera3D(GLFWwindow *window)
 {
-  if (this->firstclick)
-  {
-    glfwSetCursorPos(window, (this->width / 2), (this->height / 2));
-    this->firstclick = 0;
-  }
   double mouseX;
   double mouseY;
-  glfwGetCursorPos(window, &mouseX, &mouseY);
-  float rotX = this->sensitivity * (float)(mouseY - (this->height / 2)) / this->height;
-  float rotY = this->sensitivity * (float)(mouseX - (this->width / 2)) / this->width;
-  vec3 oldor;
-  oldor[0] = this->orientation[0];
-  oldor[1] = this->orientation[1];
-  oldor[2] = this->orientation[2];
-  vec3 cross;
-  glm_vec3_cross(this->orientation, this->up, cross);
-  glm_vec3_normalize(cross);
-  glm_vec3_rotate(this->orientation, glm_rad(-rotX), cross);
-  if (fabs(glm_vec3_angle(this->orientation, this->up) - glm_rad(90.0f)) > glm_rad(85.0f))
+  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && this->lastmousex != -1 && this->lastmousey != -1)
   {
-    this->orientation[0] = oldor[0];
-    this->orientation[1] = oldor[1];
-    this->orientation[2] = oldor[2];
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+    float rotX = this->sensitivity * (float)(mouseY - this->lastmousey) / this->height;
+    float rotY = this->sensitivity * (float)(mouseX - this->lastmousex) / this->width;
+    vec3 oldor;
+    oldor[0] = this->orientation[0];
+    oldor[1] = this->orientation[1];
+    oldor[2] = this->orientation[2];
+    vec3 cross;
+    glm_vec3_cross(this->orientation, this->up, cross);
+    glm_vec3_normalize(cross);
+    glm_vec3_rotate(this->orientation, glm_rad(-rotX), cross);
+    if (fabs(glm_vec3_angle(this->orientation, this->up) - glm_rad(90.0f)) > glm_rad(85.0f))
+    {
+      this->orientation[0] = oldor[0];
+      this->orientation[1] = oldor[1];
+      this->orientation[2] = oldor[2];
+    }
+    glm_vec3_rotate(this->orientation, glm_rad(-rotY), this->up);
   }
-  glm_vec3_rotate(this->orientation, glm_rad(-rotY), this->up);
-  glfwSetCursorPos(window, (this->width / 2), (this->height / 2));
+  glfwGetCursorPos(window, &mouseX, &mouseY);
+  this->lastmousex = mouseX;
+  this->lastmousey = mouseY;
 }
 void camera::run_input_free_camera3D(GLFWwindow *window)
 {
@@ -104,22 +104,13 @@ void camera::run_input_free_camera3D(GLFWwindow *window)
   }
   if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
   {
-    this->speed = 1;
+    this->speed = this->basespeed * 2;
   }
   else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
   {
-    this->speed = 0.1f;
+    this->speed = this->basespeed;
   }
-  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-  {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-    this->run_input_rotate_camera3D(window);
-  }
-  else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-  {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    this->firstclick = 1;
-  }
+  this->run_input_rotate_camera3D(window);
 }
 void camera::calculate()
 {
@@ -146,11 +137,10 @@ void camera::use(const shader_program &program)
   }
   it = std::find(this->programs.begin(), this->programs.end(), program.get());
   int index = std::distance(this->programs.begin(), it);
-  GLint *uniforms = this->uniforms.data();
-  glUniformMatrix4fv(uniforms[index * 4], 1, GL_FALSE, this->result[0]);
-  glUniform3f(uniforms[index * 4 + 1], this->position[0], this->position[1], this->position[2]);
-  glUniformMatrix4fv(uniforms[index * 4 + 2], 1, GL_FALSE, this->view[0]);
-  glUniformMatrix4fv(uniforms[index * 4 + 3], 1, GL_FALSE, this->projection[0]);
+  glUniformMatrix4fv(this->uniforms[index * 4], 1, GL_FALSE, this->result[0]);
+  glUniform3f(this->uniforms[index * 4 + 1], this->position[0], this->position[1], this->position[2]);
+  glUniformMatrix4fv(this->uniforms[index * 4 + 2], 1, GL_FALSE, this->view[0]);
+  glUniformMatrix4fv(this->uniforms[index * 4 + 3], 1, GL_FALSE, this->projection[0]);
 }
 void camera_perspective::calculate_projection()
 {
@@ -169,7 +159,6 @@ camera_orthogonal::camera_orthogonal(int screenwidth, int screenheight, float le
   this->up[0] = 0;
   this->up[1] = 1;
   this->up[2] = 0;
-  this->firstclick = 1;
   this->speed = speed;
   this->sensitivity = sensitivity;
   this->width = screenwidth;
@@ -183,6 +172,7 @@ camera_orthogonal::camera_orthogonal(int screenwidth, int screenheight, float le
   this->top = top;
   this->nearPlane = nearPlane;
   this->farPlane = farPlane;
+  this->basespeed = speed;
   if (angle != 0)
   {
     glm_vec3_rotate(this->orientation, glm_rad(angle), angle_axis);

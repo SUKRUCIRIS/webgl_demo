@@ -35,6 +35,7 @@ int main()
   ld.scwidth = width;
   ld.trenderer = new ui_text_renderer("./fonts/arial.ttf", 128, 1920, 1080, width, height, GL_LINEAR, GL_LINEAR);
   ld.objmanager = new object_manager(width, height);
+  ld.texmanager = new texture_manager();
   ld.objmanager->create_cube_object();
   ld.objmanager->prepare_render();
 
@@ -42,6 +43,8 @@ int main()
 
   emscripten_set_main_loop(mainloop, 0, 1);
 
+  delete ld.texmanager;
+  delete ld.objmanager;
   delete ld.trenderer;
   glfwDestroyWindow(window);
   glfwTerminate();

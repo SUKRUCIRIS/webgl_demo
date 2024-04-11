@@ -12,11 +12,13 @@ protected:
   vec3 position;
   vec3 orientation;
   vec3 up;
-  unsigned char firstclick;
   float speed;
+  float basespeed;
   float sensitivity;
   float nearPlane;
   float farPlane;
+  float lastmousex = -1;
+  float lastmousey = -1;
   int width;
   int height;
   mat4 view;
@@ -44,7 +46,7 @@ protected:
   virtual void calculate_projection();
 
 public:
-  camera_perspective(int screenwidth, int screenheight, vec3 position, float FOVdeg, float nearPlane, float farPlane, float speed = 1,
+  camera_perspective(int screenwidth, int screenheight, vec3 position, float FOVdeg, float nearPlane, float farPlane, float speed = 0.1f,
                      float sensitivity = 100, float angle = 0, vec3 angle_axis = 0);
 };
 

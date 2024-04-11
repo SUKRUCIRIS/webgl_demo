@@ -5,3 +5,4 @@
 #include "shader.h"
 #include "camera.h"
 #include "mesh.h"
+#include "texture.h"

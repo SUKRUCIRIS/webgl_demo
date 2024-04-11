@@ -7,6 +7,7 @@ typedef struct loopdata
   ui_text_renderer *trenderer = 0;
   int scwidth = 0, scheight = 0;
   object_manager *objmanager = 0;
+  texture_manager *texmanager = 0;
 } loopdata;
 
 void mainloop(void);
