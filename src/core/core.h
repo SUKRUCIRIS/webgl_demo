@@ -8,3 +8,4 @@
 #include "texture.h"
 #include "skybox.h"
 #include "load_object.h"
+#include "input.h"

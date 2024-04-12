@@ -168,6 +168,22 @@ void object_manager::render(const shader_program &program, camera &cam)
       this->uniforms.push_back(uniform);
       uniform = glGetUniformLocation(program.get(), "normalMatrix");
       this->uniforms.push_back(uniform);
+      uniform = glGetUniformLocation(program.get(), "tempdivisor1");
+      this->uniforms.push_back(uniform);
+      uniform = glGetUniformLocation(program.get(), "tempdivisor2");
+      this->uniforms.push_back(uniform);
+      uniform = glGetUniformLocation(program.get(), "part1temp");
+      this->uniforms.push_back(uniform);
+      uniform = glGetUniformLocation(program.get(), "part2temp");
+      this->uniforms.push_back(uniform);
+      uniform = glGetUniformLocation(program.get(), "part3temp");
+      this->uniforms.push_back(uniform);
+      uniform = glGetUniformLocation(program.get(), "degree20color");
+      this->uniforms.push_back(uniform);
+      uniform = glGetUniformLocation(program.get(), "degree60color");
+      this->uniforms.push_back(uniform);
+      uniform = glGetUniformLocation(program.get(), "maketemp");
+      this->uniforms.push_back(uniform);
     }
     it = std::find(this->programs.begin(), this->programs.end(), program.get());
     int index = std::distance(this->programs.begin(), it);
@@ -175,8 +191,16 @@ void object_manager::render(const shader_program &program, camera &cam)
     glm_mat4_mulN(tmp, 3, this->model);
     glm_mat4_inv(this->model, this->normal);
     glm_mat4_transpose(this->normal);
-    glUniformMatrix4fv(this->uniforms[index * 2], 1, GL_FALSE, this->model[0]);
-    glUniformMatrix4fv(this->uniforms[index * 2 + 1], 1, GL_FALSE, this->normal[0]);
+    glUniformMatrix4fv(this->uniforms[index * 10], 1, GL_FALSE, this->model[0]);
+    glUniformMatrix4fv(this->uniforms[index * 10 + 1], 1, GL_FALSE, this->normal[0]);
+    glUniform1f(uniforms[index * 10 + 2], this->tempdivisor1);
+    glUniform1f(uniforms[index * 10 + 3], this->tempdivisor2);
+    glUniform1f(uniforms[index * 10 + 4], this->part1temp);
+    glUniform1f(uniforms[index * 10 + 5], this->part2temp);
+    glUniform1f(uniforms[index * 10 + 6], this->part3temp);
+    glUniform3f(uniforms[index * 10 + 7], this->degree20color[0], this->degree20color[1], this->degree20color[2]);
+    glUniform3f(uniforms[index * 10 + 8], this->degree60color[0], this->degree60color[1], this->degree60color[2]);
+    glUniform1f(uniforms[index * 10 + 9], this->maketemp);
 
     if (this->subdata)
     {
@@ -308,4 +332,35 @@ object_manager::object *object_manager::create_cube_object(float texture_index, 
   }
 
   return id;
+}
+void object_manager::set_temp_settings(float tempdiv1, float tempdiv2, vec3 degree20color, vec3 degree60color)
+{
+  this->tempdivisor1 = tempdiv1;
+  this->tempdivisor2 = tempdiv2;
+  if (degree20color != 0)
+  {
+    glm_vec3_copy(degree20color, this->degree20color);
+  }
+  if (degree60color != 0)
+  {
+    glm_vec3_copy(degree60color, this->degree60color);
+  }
+}
+void object_manager::set_temp(float part1, float part2, float part3)
+{
+  this->part1temp = part1;
+  this->part2temp = part2;
+  this->part3temp = part3;
+}
+void object_manager::enable_temp()
+{
+  this->maketemp = 1;
+}
+void object_manager::disable_temp()
+{
+  this->maketemp = 0;
+}
+float object_manager::get_temp()
+{
+  return this->maketemp;
 }

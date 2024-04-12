@@ -35,6 +35,10 @@ private:
   static shader_program *default_program;
   static camera *default_cam;
   void object_apply_model_matrix(object *obj);
+  float tempdivisor1 = 0, tempdivisor2 = 1, part1temp = 20, part2temp = 20, part3temp = 20;
+  vec3 degree20color = {0, 0, 1};
+  vec3 degree60color = {1, 0, 0};
+  float maketemp = 0;
 
 public:
   object_manager(int realsw, int realsh);
@@ -54,4 +58,9 @@ public:
   static camera *get_default_camera();
   static shader_program *get_default_program();
   object *create_cube_object(float texture_index = 0, vec3 pos = 0, vec3 scaling = 0);
+  void set_temp_settings(float tempdiv1, float tempdiv2, vec3 degree20color = 0, vec3 degree60color = 0);
+  void set_temp(float part1, float part2, float part3);
+  void enable_temp();
+  void disable_temp();
+  float get_temp();
 };

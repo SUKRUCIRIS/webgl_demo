@@ -40,11 +40,13 @@ int main()
                      "./textures/skybox/py.png", "./textures/skybox/ny.png",
                      "./textures/skybox/pz.png", "./textures/skybox/nz.png",
                      object_manager::get_default_camera());
+  ld.inpmanager = new input_manager();
 
   prepareloop(&ld);
 
   emscripten_set_main_loop(mainloop, 0, 1);
 
+  delete ld.inpmanager;
   delete ld.sb;
   delete ld.texmanager;
   delete ld.objmanager;

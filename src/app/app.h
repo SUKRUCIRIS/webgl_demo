@@ -9,6 +9,7 @@ typedef struct loopdata
   object_manager *objmanager = 0;
   texture_manager *texmanager = 0;
   skybox *sb = 0;
+  input_manager *inpmanager = 0;
 } loopdata;
 
 void mainloop(void);
