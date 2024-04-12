@@ -12,7 +12,7 @@ object_manager::object_manager(int realsw, int realsh)
   }
   if (object_manager::default_cam == 0)
   {
-    vec3 pos = {0, 0, 2};
+    vec3 pos = {0, 5, 20};
     object_manager::default_cam = new camera_perspective(realsw, realsh, pos, 60, 0.1f, 1000, 0.1f, 100);
   }
   this->VAO = 0;
@@ -200,10 +200,12 @@ void object_manager::object_apply_model_matrix(object *obj)
   for (unsigned int i = 0; i < obj->vertex_number; i++)
   {
     vec4 vert = {vertices[(obj->vertex_start + i) * 9], vertices[(obj->vertex_start + i) * 9 + 1], vertices[(obj->vertex_start + i) * 9 + 2], 1};
-    glm_mat4_mulv(obj->model, vert, &(vertices[(obj->vertex_start + i) * 9]));
+    glm_mat4_mulv(obj->model, vert, tmp);
+    glm_vec3_copy(tmp, &(vertices[(obj->vertex_start + i) * 9]));
 
     vec4 norm = {vertices[(obj->vertex_start + i) * 9 + 5], vertices[(obj->vertex_start + i) * 9 + 6], vertices[(obj->vertex_start + i) * 9 + 7], 1};
-    glm_mat4_mulv(obj->normal, norm, &(vertices[(obj->vertex_start + i) * 9 + 5]));
+    glm_mat4_mulv(obj->normal, norm, tmp);
+    glm_vec3_copy(tmp, &(vertices[(obj->vertex_start + i) * 9 + 5]));
   }
   glm_mat4_identity(obj->model);
   glm_mat4_identity(obj->normal);

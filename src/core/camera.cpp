@@ -1,6 +1,5 @@
 #include "camera.h"
 // Şükrü Çiriş 2024
-
 camera_perspective::camera_perspective(int screenwidth, int screenheight, vec3 position, float FOVdeg, float nearPlane, float farPlane, float speed,
                                        float sensitivity, float angle, vec3 angle_axis)
 {

@@ -21,6 +21,7 @@ texture_manager::texture *texture_manager::create_texture(std::string path, GLen
   unsigned char *bytes = stbi_load(path.c_str(), &widthImg, &heightImg, &numColCh, 0);
   if (!bytes)
   {
+    emscripten_console_error("STB can't load texture...");
     return 0;
   }
   GLenum format = GL_RGB;
@@ -63,6 +64,39 @@ texture_manager::texture *texture_manager::create_texture(std::string path, GLen
     glGenerateMipmap(texType);
   }
   stbi_image_free(bytes);
+  glBindTexture(texType, 0);
+  tex->type = texType;
+  this->textures.push_back(tex);
+  this->indices[this->textures.size() - 1] = index;
+  emscripten_console_log(("Texture created index: " + std::to_string(index)).c_str());
+  return tex;
+}
+texture_manager::texture *texture_manager::create_texture_memory(unsigned char *data, int width, int height, GLenum texType, GLint min_filter,
+                                                                 GLint mag_filter, int index, int wraps, int wrapt)
+{
+  if (this->textures.size() >= 16)
+  {
+    return 0;
+  }
+  glBindTexture(texType, 0);
+  texture *tex = new texture;
+  tex->id = 0;
+  tex->type = 0;
+  glGenTextures(1, &(tex->id));
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(texType, tex->id);
+  glTexParameteri(texType, GL_TEXTURE_MIN_FILTER, min_filter);
+  glTexParameteri(texType, GL_TEXTURE_MAG_FILTER, mag_filter);
+  glTexParameteri(texType, GL_TEXTURE_WRAP_S, wraps);
+  glTexParameteri(texType, GL_TEXTURE_WRAP_T, wrapt);
+  glTexImage2D(texType, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  if (min_filter == GL_NEAREST_MIPMAP_NEAREST ||
+      min_filter == GL_LINEAR_MIPMAP_NEAREST ||
+      min_filter == GL_NEAREST_MIPMAP_LINEAR ||
+      min_filter == GL_LINEAR_MIPMAP_LINEAR)
+  {
+    glGenerateMipmap(texType);
+  }
   glBindTexture(texType, 0);
   tex->type = texType;
   this->textures.push_back(tex);

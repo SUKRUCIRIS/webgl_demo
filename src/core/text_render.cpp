@@ -151,7 +151,7 @@ void ui_text_renderer::add_text(float startx, float starty, float z, float scale
   this->indices.insert(this->indices.end(), indices, indices + 6 * text.size());
   free(indices);
 }
-void ui_text_renderer::get_text_size(int scale, float *width, float *height, const std::string &text)
+void ui_text_renderer::get_text_size(float scale, float *width, float *height, const std::string &text)
 {
   *width = 0;
   *height = 0;

@@ -7,3 +7,4 @@
 #include "mesh.h"
 #include "texture.h"
 #include "skybox.h"
+#include "load_object.h"

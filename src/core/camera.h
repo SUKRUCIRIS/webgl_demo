@@ -3,7 +3,6 @@
 #include <vector>
 #include "shader.h"
 // Şükrü Çiriş 2024
-
 class camera
 {
 protected:

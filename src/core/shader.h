@@ -2,7 +2,6 @@
 #include "tp.h"
 #include <string>
 // Şükrü Çiriş 2024
-
 class shader_program
 {
 private:

@@ -2,7 +2,6 @@
 #include "tp.h"
 #include "camera.h"
 // Şükrü Çiriş 2024
-
 class skybox
 {
 private:

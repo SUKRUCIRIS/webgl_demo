@@ -4,10 +4,9 @@
 #include "shader.h"
 #include "camera.h"
 // Şükrü Çiriş 2024
-
 class object_manager
 {
-private:
+public:
   struct object
   {
     size_t vertex_number;
@@ -17,6 +16,8 @@ private:
     mat4 model;
     mat4 normal;
   };
+
+private:
   std::vector<object *> objects;
   GLuint VAO, VBO, EBO;
   std::vector<GLfloat> vertices; // 3 vertex coord, 2 texture coord, 3 normal coord, 1 texture id

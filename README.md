@@ -5,11 +5,13 @@ emscripten, cmake, make
 ## How to compile project:
 
 ```
-build.bat
+build
 ```
 
 ## How to run project:
 
 ```
-run.bat
+run
 ```
+
+Şükrü Çiriş 2024

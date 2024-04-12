@@ -4,7 +4,6 @@
 #include "tp.h"
 #include <vector>
 #include <string>
-
 // Şükrü Çiriş 2024
 class ui_text_renderer
 {
@@ -34,7 +33,7 @@ public:
                    int realsw, int realsh, GLint min_filter, GLint mag_filter);
   ~ui_text_renderer();
   void add_text(float startx, float starty, float z, float scale, vec4 rgba, const std::string &text);
-  void get_text_size(int scale, float *width, float *height, const std::string &text);
+  void get_text_size(float scale, float *width, float *height, const std::string &text);
   void render(const shader_program &program = *default_program, camera &cam = *default_cam);
   void clear();
 };
